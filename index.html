@@ -21,9 +21,32 @@
                 }
             }
         }
+        /* Animation pour secouer la modale en cas d'erreur */
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .animate-shake {
+          animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
     </style>
 </head>
 <body class="bg-[#F5F0E8] font-montserrat text-[#212121]">
+
+    <!-- Écran de protection par mot de passe -->
+    <div id="protection-overlay" class="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 transition-opacity duration-300">
+        <div id="modal-content" class="bg-white p-8 rounded-lg shadow-xl text-center w-11/12 max-w-sm">
+            <h2 class="font-playfair text-2xl font-bold mb-4">Accès Protégé</h2>
+            <p class="mb-6 text-gray-600">Veuillez entrer le code d'accès pour consulter la charte graphique.</p>
+            <input type="password" id="password-input" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-center text-lg tracking-widest focus:ring-2 focus:ring-[#D48C4B] focus:border-[#D48C4B] outline-none" placeholder="••••">
+            <p id="error-message" class="text-red-500 text-sm mt-2 h-5"></p> <!-- Espace pour le message d'erreur -->
+            <button onclick="checkPassword()" class="w-full mt-4 bg-[#212121] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#424242] transition-colors">
+                Accéder
+            </button>
+        </div>
+    </div>
 
     <div class="container mx-auto p-4 sm:p-8 md:p-12">
         
@@ -154,6 +177,43 @@
         </footer>
 
     </div>
+
+    <script>
+        function checkPassword() {
+            const input = document.getElementById('password-input');
+            const overlay = document.getElementById('protection-overlay');
+            const errorMessage = document.getElementById('error-message');
+            const modalContent = document.getElementById('modal-content');
+            const correctPassword = '5008';
+
+            if (input.value === correctPassword) {
+                overlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            } else {
+                errorMessage.textContent = 'Code incorrect. Veuillez réessayer.';
+                input.classList.add('border-red-500');
+                modalContent.classList.add('animate-shake');
+                
+                // Réinitialiser après l'animation
+                setTimeout(() => {
+                    modalContent.classList.remove('animate-shake');
+                    input.classList.remove('border-red-500');
+                    errorMessage.textContent = '';
+                }, 820);
+                input.value = '';
+            }
+        }
+
+        // Permettre l'accès en appuyant sur la touche "Entrée"
+        document.getElementById('password-input').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                checkPassword();
+            }
+        });
+    </script>
 
 </body>
 </html>
